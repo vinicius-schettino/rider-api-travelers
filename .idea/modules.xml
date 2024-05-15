@@ -2,6 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/payment.iml" filepath="$PROJECT_DIR$/.idea/modules/payment.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/payment.main.iml" filepath="$PROJECT_DIR$/.idea/modules/payment.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/payment.test.iml" filepath="$PROJECT_DIR$/.idea/modules/payment.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/rider-api-travelers.iml" filepath="$PROJECT_DIR$/.idea/rider-api-travelers.iml" />
     </modules>
   </component>
