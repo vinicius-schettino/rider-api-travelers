@@ -6,10 +6,12 @@ import com.rider.payment.repositories.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
 public class PaymentStatusManager {
-    @Autowired
-    private PaymentRepository paymentRepository;
+    private final PaymentRepository paymentRepository;
+
+    public PaymentStatusManager(PaymentRepository paymentRepository) {
+        this.paymentRepository = paymentRepository;
+    }
 
     public void createPayment(Payment payment) {
         payment.setPaymentStatus(PaymentStatus.PENDING);

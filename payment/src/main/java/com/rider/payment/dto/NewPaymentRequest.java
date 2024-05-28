@@ -21,8 +21,6 @@ public class NewPaymentRequest {
 
     private String cardHolder;
 
-    private String cardName;
-
     private String cardNumber;
 
     private String cardCode;

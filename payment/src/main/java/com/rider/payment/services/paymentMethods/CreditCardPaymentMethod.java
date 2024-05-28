@@ -3,6 +3,7 @@ package com.rider.payment.services.paymentMethods;
 
 import com.rider.payment.entities.paymentMethods.PaymentMethod;
 import com.rider.payment.entities.paymentMethods.PaymentType;
+import com.rider.payment.repositories.PaymentMethodRepository;
 import org.springframework.util.Assert;
 
 import java.util.regex.Matcher;
@@ -26,10 +27,10 @@ public class CreditCardPaymentMethod implements GenericPaymentMethod {
         this.cardCode = cardCode;
     }
 
-    public PaymentMethod buildPaymentMethod() {
+    public PaymentMethod buildPaymentMethod(PaymentMethodRepository paymentMethodRepository) {
         this.validateCreditCard();
 
-        return new PaymentMethod(this.paymentType);
+        return paymentMethodRepository.findByPaymentType(this.paymentType);
     }
 
     private void validateCreditCard() throws IllegalArgumentException {

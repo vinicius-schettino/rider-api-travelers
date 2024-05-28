@@ -36,6 +36,11 @@ public class Payment {
     @Column
     private PaymentStatus paymentStatus;
 
-    public Payment(Double amount, PaymentMethod paymentMethod, PaymentStatus paymentStatus, Date date) {
+    public Payment(Double amount, PaymentMethod paymentMethod, PaymentStatus paymentStatus, Date date, String userName) {
+        this.amount = amount;
+        this.paymentMethod = paymentMethod;
+        this.paymentStatus = paymentStatus;
+        this.paymentDate = date;
+        this.userName = userName;
     }
 }

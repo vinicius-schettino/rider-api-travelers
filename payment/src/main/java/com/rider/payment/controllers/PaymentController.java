@@ -7,6 +7,7 @@ import com.rider.payment.entities.invoice.InvoiceType;
 import com.rider.payment.entities.payment.Payment;
 import com.rider.payment.entities.payment.PaymentStatus;
 import com.rider.payment.repositories.InvoiceRepository;
+import com.rider.payment.repositories.PaymentMethodRepository;
 import com.rider.payment.repositories.PaymentRepository;
 import com.rider.payment.services.paymentMethods.PaymentMethodFactory;
 import com.rider.payment.services.payments.PaymentProcessing;
@@ -18,9 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("payment")
 public class PaymentController {
     @Autowired
     public PaymentRepository paymentRepository;
@@ -28,11 +31,14 @@ public class PaymentController {
     @Autowired
     public InvoiceRepository invoiceRepository;
 
-    @PostMapping("/payment")
+    @Autowired
+    public PaymentMethodRepository paymentMethodRepository;
+
+    @PostMapping("/pay")
     @Transactional
     public ResponseEntity<Object> doPayment(@RequestBody @Valid NewPaymentRequest request) {
         try {
-            Payment payment = PaymentProcessing.processPayment(request.getAmount(), PaymentMethodFactory.build(request));
+            Payment payment = PaymentProcessing.processPayment(request.getAmount(), request.getUserName(), PaymentMethodFactory.build(request), paymentRepository, paymentMethodRepository);
 
             if(payment.getPaymentStatus().equals(PaymentStatus.FAILED))
                 return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Não foi possível concluir o pagamento com sucesso, tente novamente mais tarde");
@@ -42,8 +48,9 @@ public class PaymentController {
             invoiceRepository.save(invoice);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(invoice);
-        } catch (IllegalArgumentException exception) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Dados do Cartão de Crédito enviados não são válidos");
+        }
+        catch (IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Dados do Cartão de Crédito enviados não são válidos: " + exception.getMessage());
         }
     }
 
@@ -56,7 +63,7 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Não existe um pagamento elegível para reembolso com o ID especificado");
         }
 
-        PaymentStatusManager manager = new PaymentStatusManager();
+        PaymentStatusManager manager = new PaymentStatusManager(paymentRepository);
         manager.refundPayment(payment);
 
         Invoice invoice = new Invoice(null, payment.getAmount(), payment.getPaymentMethod(), payment.getPaymentStatus(), InvoiceType.PAYMENT, request.getUserName(), request.getRiderName(), payment.getPaymentDate());
